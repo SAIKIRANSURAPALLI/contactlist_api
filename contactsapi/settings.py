@@ -147,11 +147,15 @@ USE_TZ = True
 AUTH_USER_MODEL = 'api.CustomUser'
 
 #JWT
-JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'default_secret_key')
+
+
 
 #CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
+#WSGI
+WSGI_APPLICATION = 'contactsapi.wsgi.application'
 
 CORS_ALLOW_HEADERS = [
     'content-type',

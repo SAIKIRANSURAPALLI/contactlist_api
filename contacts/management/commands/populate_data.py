@@ -13,7 +13,14 @@ class Command(BaseCommand):
         self.User = get_user_model()
 
     def handle(self, *args, **options):
+        # Create or get a specific user
         user, created = self.User.objects.get_or_create(username='allisongreen')
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Created new user: {user.username}'))
+        else:
+            self.stdout.write(self.style.SUCCESS(f'User already exists: {user.username}'))
+        
+        # Create a random contact for the specific user
         Contact.objects.create(
             owner=user, 
             name=self.fake.name(), 
@@ -23,7 +30,7 @@ class Command(BaseCommand):
         )
 
         # Create random users
-        for _ in range(50):  # 50 users
+        for _ in range(50):  
             user = self.User.objects.create_user(
                 username=self.fake.user_name(),
                 email=self.fake.email(),
@@ -31,17 +38,19 @@ class Command(BaseCommand):
                 password='password123'
             )
             user.save()
+            self.stdout.write(self.style.SUCCESS(f'Created user: {user.username}'))
 
-        # Create random contacts
+        # Create random contacts for all users
         users = self.User.objects.all()
         for user in users:
             for _ in range(random.randint(5, 20)): 
-                Contact.objects.create(
+                contact = Contact.objects.create(
                     owner=user,
                     name=self.fake.name(),
                     phone_number=self.fake.phone_number(),
                     is_spam=random.choice([True, False]),
                     spam_likelihood=random.uniform(0, 100)
                 )
+                self.stdout.write(self.style.SUCCESS(f'Created contact for user {user.username}: {contact}'))
 
         self.stdout.write(self.style.SUCCESS('Database populated with random data'))
